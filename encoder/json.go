@@ -16,7 +16,7 @@ func NewJSON() Encoder {
 	return e
 }
 
-func (e *json) Encode(v interface{}) ([]byte, error) {
+func (e *json) Encode(v any) ([]byte, error) {
 	if v, err := p_json.Marshal(v); err != nil {
 		return nil, ers.ErrInternal.New(fmt.Sprintf("failed to marshal: %#v", v))
 	} else {

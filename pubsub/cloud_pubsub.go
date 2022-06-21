@@ -31,7 +31,6 @@ func NewCloudPubSub(client *pubsub.Client, topicID string, subscriptionID string
 		} else if err != nil {
 			return nil, ers.ErrInternal.New(err)
 		}
-		break
 	}
 
 	p := &cloudPB{client: client, topicID: topicID, subscriptionID: subscriptionID}

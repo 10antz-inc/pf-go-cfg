@@ -22,7 +22,7 @@ func (o expiration) Validate() error {
 	return nil
 }
 
-func (o expiration) Apply(options interface{}) {
+func (o expiration) Apply(options any) {
 	switch v := options.(type) {
 	case *ClientOptions:
 		v.Expiration = &o

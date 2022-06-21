@@ -23,7 +23,7 @@ func (o decoder) Validate() error {
 	return nil
 }
 
-func (o decoder) Apply(options interface{}) {
+func (o decoder) Apply(options any) {
 	switch v := options.(type) {
 	case *ClientOptions:
 		v.Decoder = &o

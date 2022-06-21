@@ -22,7 +22,7 @@ func (o cleanupInterval) Validate() error {
 	return nil
 }
 
-func (o cleanupInterval) Apply(options interface{}) {
+func (o cleanupInterval) Apply(options any) {
 	switch v := options.(type) {
 	case *MemoryOptions:
 		v.CleanupInterval = &o

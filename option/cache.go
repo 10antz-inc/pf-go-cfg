@@ -23,7 +23,7 @@ func (o cache) Validate() error {
 	return nil
 }
 
-func (o cache) Apply(options interface{}) {
+func (o cache) Apply(options any) {
 	switch v := options.(type) {
 	case *ClientOptions:
 		v.Cache = &o

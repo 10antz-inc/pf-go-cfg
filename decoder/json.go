@@ -16,7 +16,7 @@ func NewJSON() Decoder {
 	return d
 }
 
-func (d *json) Decode(data []byte, v interface{}) error {
+func (d *json) Decode(data []byte, v any) error {
 	if err := p_json.Unmarshal(data, v); err != nil {
 		return ers.ErrInternal.New(fmt.Sprintf("failed to unmarshal: %t <- %s", v, data))
 	}
