@@ -1,3 +1,5 @@
+[![Lint & Unit Test](https://github.com/tys-muta/go-cfg/workflows/Lint%20&%20Unit%20Test/badge.svg)](https://github.com/tys-muta/go-cfg/actions/workflows/test.yaml)
+
 # go-cfg
 
 - サービス間で同一のデータソース（オリジン）を共用するためのパッケージ
