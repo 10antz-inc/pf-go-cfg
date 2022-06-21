@@ -18,10 +18,10 @@ import (
 )
 
 type Client interface {
-	Get(ctx context.Context) (interface{}, error)
-	Set(ctx context.Context, value interface{}) error
-	Encode(value interface{}) ([]byte, error)
-	Decode(value []byte) (interface{}, error)
+	Get(ctx context.Context) (any, error)
+	Set(ctx context.Context, value any) error
+	Encode(value any) ([]byte, error)
+	Decode(value []byte) (any, error)
 	Available() bool
 	Close() error
 }
@@ -40,7 +40,7 @@ type client struct {
 
 var _ Client = (*client)(nil)
 
-func NewClient(ctx context.Context, msg interface{}, origin store.Store, pubsub pubsub.PubSub, options ...opt.Option) (Client, error) {
+func NewClient(ctx context.Context, msg any, origin store.Store, pubsub pubsub.PubSub, options ...opt.Option) (Client, error) {
 	c := &client{
 		msg:       newMessage(msg),
 		origin:    origin,
@@ -95,7 +95,7 @@ func NewClient(ctx context.Context, msg interface{}, origin store.Store, pubsub 
 	return c, nil
 }
 
-func (c *client) Get(ctx context.Context) (interface{}, error) {
+func (c *client) Get(ctx context.Context) (any, error) {
 	if v, err := c.get(ctx, c.cache); err != nil {
 		return nil, ers.W(err)
 	} else if v != nil {
@@ -114,7 +114,7 @@ func (c *client) Get(ctx context.Context) (interface{}, error) {
 	return nil, nil
 }
 
-func (c *client) Set(ctx context.Context, value interface{}) error {
+func (c *client) Set(ctx context.Context, value any) error {
 	if err := c.set(ctx, c.cache, value); err != nil {
 		return ers.W(err)
 	}
@@ -130,7 +130,7 @@ func (c *client) Set(ctx context.Context, value interface{}) error {
 	return nil
 }
 
-func (c *client) Encode(value interface{}) ([]byte, error) {
+func (c *client) Encode(value any) ([]byte, error) {
 	if v, err := c.encoder.Encode(value); err != nil {
 		return nil, ers.W(err)
 	} else {
@@ -138,7 +138,7 @@ func (c *client) Encode(value interface{}) ([]byte, error) {
 	}
 }
 
-func (c *client) Decode(value []byte) (interface{}, error) {
+func (c *client) Decode(value []byte) (any, error) {
 	v := c.msg.new()
 	if err := c.decoder.Decode(value, v); err != nil {
 		return nil, ers.W(err)
@@ -160,7 +160,7 @@ func (c *client) Close() error {
 	return nil
 }
 
-func (c *client) get(ctx context.Context, store store.Store) (interface{}, error) {
+func (c *client) get(ctx context.Context, store store.Store) (any, error) {
 	c.mu[store].RLock()
 	defer c.mu[store].RUnlock()
 
@@ -177,7 +177,7 @@ func (c *client) get(ctx context.Context, store store.Store) (interface{}, error
 	}
 }
 
-func (c *client) set(ctx context.Context, store store.Store, value interface{}) error {
+func (c *client) set(ctx context.Context, store store.Store, value any) error {
 	c.mu[store].Lock()
 	defer c.mu[store].Unlock()
 

@@ -8,7 +8,7 @@ type message struct {
 	reflect.Type
 }
 
-func newMessage(msg interface{}) *message {
+func newMessage(msg any) *message {
 	m := &message{
 		Type: reflect.ValueOf(msg).Type(),
 	}
@@ -19,6 +19,6 @@ func newMessage(msg interface{}) *message {
 //
 // reflect.New は型のインスタンスを生成後にそのポインタを返すが、
 // インスタンス自体では無いことに注意する
-func (m *message) new() interface{} {
+func (m *message) new() any {
 	return reflect.New(m.Type).Interface()
 }

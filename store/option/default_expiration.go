@@ -22,7 +22,7 @@ func (o defaultExpiration) Validate() error {
 	return nil
 }
 
-func (o defaultExpiration) Apply(options interface{}) {
+func (o defaultExpiration) Apply(options any) {
 	switch v := options.(type) {
 	case *MemoryOptions:
 		v.DefaultExpiration = &o

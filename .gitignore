@@ -4,7 +4,7 @@
 # dot files
 .env
 .idea
-.vscode
+# .vscode
 .sqx.toml
 
 # project temporary files
