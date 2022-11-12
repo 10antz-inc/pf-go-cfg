@@ -2,8 +2,10 @@ package pubsub
 
 import (
 	"context"
+	"fmt"
 
 	"cloud.google.com/go/pubsub"
+	"github.com/google/uuid"
 	"github.com/tys-muta/go-cfg/errors"
 	"github.com/tys-muta/go-ers"
 	"google.golang.org/grpc/codes"
@@ -11,15 +13,14 @@ import (
 )
 
 type cloudPB struct {
-	client         pubsub.Client
-	topicID        string
-	subscriptionID string
+	client  pubsub.Client
+	topicID string
 }
 
 var _ PubSub = (*cloudPB)(nil)
 
-func NewCloudPubSub(client pubsub.Client, topicID string, subscriptionID string) *cloudPB {
-	return &cloudPB{client: client, topicID: topicID, subscriptionID: subscriptionID}
+func NewCloudPubSub(client pubsub.Client, topicID string) *cloudPB {
+	return &cloudPB{client: client, topicID: topicID}
 }
 
 func (p *cloudPB) Publish(ctx context.Context, msg []byte) error {
@@ -31,7 +32,13 @@ func (p *cloudPB) Publish(ctx context.Context, msg []byte) error {
 }
 
 func (p *cloudPB) Subscribe(ctx context.Context, subFunc SubscribeFunc) error {
-	if err := p.client.Subscription(p.subscriptionID).Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
+	id := fmt.Sprintf("%s-%s", p.topicID, uuid.New().String())
+	sub, err := p.client.CreateSubscription(ctx, id, pubsub.SubscriptionConfig{Topic: p.client.Topic(p.topicID)})
+	if err != nil {
+		return ers.ErrInternal.New(err)
+	}
+
+	if err := sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
 		if err := subFunc(ctx, msg.Data); err != nil {
 			return
 		}

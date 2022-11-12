@@ -2,6 +2,7 @@ package cfg
 
 import (
 	"context"
+	"log"
 	"reflect"
 	"sync"
 	"time"
@@ -78,7 +79,8 @@ func NewClient(ctx context.Context, msg any, origin store.Store, pubsub pubsub.P
 	}
 
 	go func() {
-		if err := pubsub.Subscribe(ctx, func(ctx context.Context, _ []byte) error {
+		if err := pubsub.Subscribe(ctx, func(ctx context.Context, msg []byte) error {
+			log.Printf("!!!!!!!!!!  subscribe: %s", msg)
 			if err := c.del(ctx, c.cache); err != nil {
 				return ers.W(err)
 			}
