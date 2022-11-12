@@ -8,7 +8,6 @@ require (
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/tys-muta/go-ers v0.0.3
 	github.com/tys-muta/go-opt v0.0.1
-	google.golang.org/api v0.84.0
 	google.golang.org/grpc v1.47.0
 )
 
@@ -32,6 +31,7 @@ require (
 	golang.org/x/sys v0.0.0-20220610221304-9f5ed59c137d // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/xerrors v0.0.0-20220609144429-65e65417b02f // indirect
+	google.golang.org/api v0.84.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20220617124728-180714bec0ad // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
