@@ -42,6 +42,8 @@ type client struct {
 var _ Client = (*client)(nil)
 
 func NewClient(ctx context.Context, msg any, origin store.Store, pubsub pubsub.PubSub, options ...opt.Option) (Client, error) {
+	log.Printf("!!!!!!!!!!  new cfg client")
+
 	c := &client{
 		msg:       newMessage(msg),
 		origin:    origin,
@@ -95,20 +97,24 @@ func NewClient(ctx context.Context, msg any, origin store.Store, pubsub pubsub.P
 	return c, nil
 }
 
-func (c *client) Get(ctx context.Context) (any, error) {
-	if v, err := c.get(ctx, c.cache); err != nil {
+func (c *client) Get(ctx context.Context) (val any, err error) {
+	val, err = c.get(ctx, c.cache)
+	if err != nil {
 		return nil, ers.W(err)
-	} else if v != nil {
-		return v, nil
+	}
+	if val != nil {
+		return val, nil
 	}
 
-	if v, err := c.get(ctx, c.origin); err != nil {
+	val, err = c.get(ctx, c.origin)
+	if err != nil {
 		return nil, ers.W(err)
-	} else if v != nil {
-		if err := c.set(ctx, c.cache, v); err != nil {
+	}
+	if val != nil {
+		if err := c.set(ctx, c.cache, val); err != nil {
 			return nil, ers.W(err)
 		}
-		return v, nil
+		return val, nil
 	}
 
 	return nil, nil
@@ -130,23 +136,22 @@ func (c *client) Set(ctx context.Context, value any) error {
 	return nil
 }
 
-func (c *client) Encode(value any) ([]byte, error) {
-	if v, err := c.encoder.Encode(value); err != nil {
+func (c *client) Encode(val any) ([]byte, error) {
+	bytes, err := c.encoder.Encode(val)
+	if err != nil {
 		return nil, ers.W(err)
-	} else {
-		return v, nil
 	}
+	return bytes, nil
 }
 
-func (c *client) Decode(value []byte) (any, error) {
-	v := c.msg.new()
-	if err := c.decoder.Decode(value, v); err != nil {
+func (c *client) Decode(bytes []byte) (any, error) {
+	val := c.msg.new()
+	if err := c.decoder.Decode(bytes, val); err != nil {
 		return nil, ers.W(err)
-	} else {
-		// new で生成されるものはポインタなので参照先を返却する
-		v = reflect.ValueOf(v).Elem().Interface()
-		return v, nil
 	}
+
+	// new で生成されるものはポインタなので参照先を返却する
+	return reflect.ValueOf(val).Elem().Interface(), nil
 }
 
 func (c *client) Available() bool {
@@ -164,17 +169,21 @@ func (c *client) get(ctx context.Context, store store.Store) (any, error) {
 	c.mu[store].RLock()
 	defer c.mu[store].RUnlock()
 
-	if v, err := store.Get(ctx, c.msg.Name()); err != nil {
+	bytes, err := store.Get(ctx, c.msg.Name())
+	if err != nil {
 		return nil, ers.W(err)
-	} else if v == nil {
+	} else if bytes == nil {
 		return nil, nil
-	} else if v, err := c.Decode(v); err != nil {
-		return nil, ers.W(err)
-	} else if c.msg.Name() != newMessage(v).Name() {
-		return nil, ers.ErrInvalidArgument.New("message type is mismatch")
-	} else {
-		return v, nil
 	}
+
+	val, err := c.Decode(bytes)
+	if err != nil {
+		return nil, ers.W(err)
+	} else if c.msg.Name() != newMessage(val).Name() {
+		return nil, ers.ErrInvalidArgument.New("message type is mismatch")
+	}
+
+	return val, nil
 }
 
 func (c *client) set(ctx context.Context, store store.Store, value any) error {
@@ -190,13 +199,16 @@ func (c *client) set(ctx context.Context, store store.Store, value any) error {
 		options = append(options, s_option.WithExpiration(time.Duration(*v)))
 	}
 
-	if v, err := c.Encode(value); err != nil {
+	bytes, err := c.Encode(value)
+	if err != nil {
 		return ers.W(err)
-	} else if err := store.Set(ctx, c.msg.Name(), v, options...); err != nil {
-		return ers.W(err)
-	} else {
-		return nil
 	}
+
+	if err := store.Set(ctx, c.msg.Name(), bytes, options...); err != nil {
+		return ers.W(err)
+	}
+
+	return nil
 }
 
 func (c *client) del(ctx context.Context, store store.Store) error {
@@ -205,7 +217,7 @@ func (c *client) del(ctx context.Context, store store.Store) error {
 
 	if err := store.Del(ctx, c.msg.Name()); err != nil {
 		return ers.W(err)
-	} else {
-		return nil
 	}
+
+	return nil
 }
