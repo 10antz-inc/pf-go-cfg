@@ -3,13 +3,11 @@ package pubsub
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"cloud.google.com/go/pubsub"
 	"github.com/google/uuid"
-	"github.com/tys-muta/go-cfg/errors"
 	"github.com/tys-muta/go-ers"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type cloudPB struct {
@@ -38,17 +36,15 @@ func (p *cloudPB) Subscribe(ctx context.Context, subFunc SubscribeFunc) error {
 		return ers.ErrInternal.New(err)
 	}
 
+	log.Printf("!!!!!!!!!!  create subscription: %s", sub.String())
+
 	if err := sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
 		if err := subFunc(ctx, msg.Data); err != nil {
 			return
 		}
 		msg.Ack()
 	}); err != nil {
-		v, ok := err.(interface{ GRPCStatus() *status.Status })
-		if ok && v.GRPCStatus().Code() == codes.NotFound {
-			return errors.ErrNotFoundSubscription
-		}
-		return ers.ErrInternal.New(err)
+		return ers.W(err)
 	}
 
 	return nil

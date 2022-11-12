@@ -9,7 +9,6 @@ import (
 
 	"github.com/tys-muta/go-cfg/decoder"
 	"github.com/tys-muta/go-cfg/encoder"
-	"github.com/tys-muta/go-cfg/errors"
 	"github.com/tys-muta/go-cfg/option"
 	"github.com/tys-muta/go-cfg/pubsub"
 	"github.com/tys-muta/go-cfg/store"
@@ -88,9 +87,7 @@ func NewClient(ctx context.Context, msg any, origin store.Store, pubsub pubsub.P
 			}
 			return nil
 		}); err != nil {
-			if ers.Is(err, errors.ErrNotFoundSubscription) {
-				c.available = false
-			}
+			c.available = false
 		}
 	}()
 
