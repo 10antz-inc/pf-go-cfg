@@ -16,12 +16,12 @@ type memory struct {
 
 var _ Store = (*memory)(nil)
 
-func NewMemory(options ...opt.Option) (Store, error) {
+func NewMemory(options ...opt.Option) *memory {
 	s := &memory{}
 
 	o := &s_option.MemoryOptions{}
 	if err := opt.Reflect(o, options...); err != nil {
-		return nil, ers.W(err)
+		return s
 	}
 
 	var defaultExpiration time.Duration
@@ -35,7 +35,7 @@ func NewMemory(options ...opt.Option) (Store, error) {
 
 	s.client = cache.New(defaultExpiration, cleanupInterval)
 
-	return s, nil
+	return s
 }
 
 func (s *memory) Get(ctx context.Context, key string) ([]byte, error) {

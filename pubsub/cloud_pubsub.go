@@ -6,35 +6,20 @@ import (
 	"cloud.google.com/go/pubsub"
 	"github.com/tys-muta/go-cfg/errors"
 	"github.com/tys-muta/go-ers"
-	"google.golang.org/api/iterator"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 type cloudPB struct {
-	client         *pubsub.Client
+	client         pubsub.Client
 	topicID        string
 	subscriptionID string
 }
 
 var _ PubSub = (*cloudPB)(nil)
 
-func NewCloudPubSub(client *pubsub.Client, topicID string, subscriptionID string) (PubSub, error) {
-	if client == nil {
-		return nil, ers.ErrInvalidArgument.New("invalid client")
-	}
-
-	iter := client.Snapshots(context.Background())
-	for {
-		if _, err := iter.Next(); err == iterator.Done {
-			break
-		} else if err != nil {
-			return nil, ers.ErrInternal.New(err)
-		}
-	}
-
-	p := &cloudPB{client: client, topicID: topicID, subscriptionID: subscriptionID}
-	return p, nil
+func NewCloudPubSub(client pubsub.Client, topicID string, subscriptionID string) *cloudPB {
+	return &cloudPB{client: client, topicID: topicID, subscriptionID: subscriptionID}
 }
 
 func (p *cloudPB) Publish(ctx context.Context, msg []byte) error {
@@ -52,11 +37,11 @@ func (p *cloudPB) Subscribe(ctx context.Context, subFunc SubscribeFunc) error {
 		}
 		msg.Ack()
 	}); err != nil {
-		if v, ok := err.(interface{ GRPCStatus() *status.Status }); ok && v.GRPCStatus().Code() == codes.NotFound {
+		v, ok := err.(interface{ GRPCStatus() *status.Status })
+		if ok && v.GRPCStatus().Code() == codes.NotFound {
 			return errors.ErrNotFoundSubscription
-		} else {
-			return ers.ErrInternal.New(err)
 		}
+		return ers.ErrInternal.New(err)
 	}
 
 	return nil

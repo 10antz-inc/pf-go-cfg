@@ -54,13 +54,11 @@ func NewClient(ctx context.Context, msg any, origin store.Store, pubsub pubsub.P
 
 	if v := c.options.Cache; v != nil {
 		c.cache = v
-	} else if v, err := store.NewMemory(
-		s_option.WithDefaultExpiration(5*time.Minute),
-		s_option.WithCleanupInterval(60*time.Minute),
-	); err != nil {
-		return nil, ers.W(err)
 	} else {
-		c.cache = v
+		c.cache = store.NewMemory(
+			s_option.WithDefaultExpiration(5*time.Minute),
+			s_option.WithCleanupInterval(60*time.Minute),
+		)
 	}
 
 	c.mu = map[store.Store]*sync.RWMutex{}
@@ -80,7 +78,7 @@ func NewClient(ctx context.Context, msg any, origin store.Store, pubsub pubsub.P
 	}
 
 	go func() {
-		if err := pubsub.Subscribe(ctx, func(ctx context.Context, msg []byte) error {
+		if err := pubsub.Subscribe(ctx, func(ctx context.Context, _ []byte) error {
 			if err := c.del(ctx, c.cache); err != nil {
 				return ers.W(err)
 			}
