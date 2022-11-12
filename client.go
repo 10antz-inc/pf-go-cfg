@@ -89,6 +89,7 @@ func NewClient(ctx context.Context, msg any, origin store.Store, pubsub pubsub.P
 			}
 			return nil
 		}); err != nil {
+			log.Printf("!!!!!!!!!!  subscribe error: %v", err)
 			c.available = false
 		}
 	}()
