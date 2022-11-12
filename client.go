@@ -81,6 +81,7 @@ func NewClient(ctx context.Context, msg any, origin store.Store, pubsub pubsub.P
 
 	log.Printf("!!!!!!!!!!  new cfg client 2")
 	go func() {
+		ctx := context.Background()
 		log.Printf("!!!!!!!!!!  new cfg client 3")
 		if err := pubsub.Subscribe(ctx, func(ctx context.Context, msg []byte) error {
 			log.Printf("!!!!!!!!!!  subscribe: %s", msg)
