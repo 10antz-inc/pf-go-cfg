@@ -79,18 +79,15 @@ func NewClient(ctx context.Context, msg any, origin store.Store, pubsub pubsub.P
 		c.decoder = decoder.NewJSON()
 	}
 
-	log.Printf("!!!!!!!!!!  new cfg client 2")
 	go func() {
 		ctx := context.Background()
-		log.Printf("!!!!!!!!!!  new cfg client 3")
-		if err := pubsub.Subscribe(ctx, func(ctx context.Context, msg []byte) error {
-			log.Printf("!!!!!!!!!!  subscribe: %s", msg)
+		if err := pubsub.Subscribe(ctx, func(ctx context.Context, _ []byte) error {
 			if err := c.del(ctx, c.cache); err != nil {
 				return ers.W(err)
 			}
 			return nil
 		}); err != nil {
-			log.Printf("!!!!!!!!!!  subscribe error: %v", err)
+			log.Fatalf("failed to subscribe: %v", err)
 			c.available = false
 		}
 	}()

@@ -3,7 +3,6 @@ package pubsub
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"cloud.google.com/go/pubsub"
 	"github.com/google/uuid"
@@ -35,8 +34,6 @@ func (p *cloudPB) Subscribe(ctx context.Context, subFunc SubscribeFunc) error {
 	if err != nil {
 		return ers.ErrInternal.New(err)
 	}
-
-	log.Printf("!!!!!!!!!!  create subscription: %s", sub.String())
 
 	if err := sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
 		if err := subFunc(ctx, msg.Data); err != nil {
