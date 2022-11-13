@@ -41,8 +41,6 @@ type client struct {
 var _ Client = (*client)(nil)
 
 func NewClient(ctx context.Context, msg any, origin store.Store, pubsub pubsub.PubSub, options ...opt.Option) (Client, error) {
-	log.Printf("!!!!!!!!!!  new cfg client 1")
-
 	c := &client{
 		msg:       newMessage(msg),
 		origin:    origin,
