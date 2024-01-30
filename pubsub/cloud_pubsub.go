@@ -21,7 +21,11 @@ func NewCloudPubSub(client pubsub.Client, topicID string) *cloudPB {
 }
 
 func (p *cloudPB) Publish(ctx context.Context, msg []byte) error {
-	if _, err := p.client.Topic(p.topicID).Publish(ctx, &pubsub.Message{Data: msg}).Get(ctx); err != nil {
+	topic, err := p.prepareTopic(ctx)
+	if err != nil {
+		return ers.W(err)
+	}
+	if _, err := topic.Publish(ctx, &pubsub.Message{Data: msg}).Get(ctx); err != nil {
 		return ers.ErrInternal.New(err)
 	}
 
@@ -29,21 +33,33 @@ func (p *cloudPB) Publish(ctx context.Context, msg []byte) error {
 }
 
 func (p *cloudPB) Subscribe(ctx context.Context, subFunc SubscribeFunc) error {
-	id := fmt.Sprintf("%s-%s", p.topicID, uuid.New().String())
-	sub, err := p.client.CreateSubscription(ctx, id, pubsub.SubscriptionConfig{Topic: p.client.Topic(p.topicID)})
+	topic, err := p.prepareTopic(ctx)
 	if err != nil {
-		return ers.ErrInternal.New(err)
+		return ers.W(err)
 	}
+	subID := fmt.Sprintf("%s-%s", p.topicID, uuid.NewString())
+	sub, err := p.client.CreateSubscription(ctx, subID, pubsub.SubscriptionConfig{Topic: topic})
+	if err != nil {
+		return ers.W(err)
+	}
+	return ers.W(p.receive(ctx, sub, subFunc))
+}
 
-	if err := sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
-		if err := subFunc(ctx, msg.Data); err != nil {
+func (p *cloudPB) receive(ctx context.Context, sub *pubsub.Subscription, subFunc SubscribeFunc) error {
+	var receiveError, funcError error
+	receiveError = sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
+		funcError = subFunc(ctx, msg.Data)
+		if funcError != nil {
 			return
 		}
 		msg.Ack()
-	}); err != nil {
-		return ers.W(err)
+	})
+	if funcError != nil {
+		return ers.W(funcError)
 	}
-
+	if receiveError != nil {
+		return ers.W(receiveError)
+	}
 	return nil
 }
 
@@ -53,4 +69,19 @@ func (p *cloudPB) Close() error {
 	}
 
 	return nil
+}
+
+func (p *cloudPB) prepareTopic(ctx context.Context) (*pubsub.Topic, error) {
+	topic := p.client.Topic(p.topicID)
+	exists, err := topic.Exists(ctx)
+	if err != nil {
+		return nil, ers.W(err)
+	}
+	if !exists {
+		topic, err = p.client.CreateTopic(ctx, p.topicID)
+		if err != nil {
+			return nil, ers.W(err)
+		}
+	}
+	return topic, nil
 }
