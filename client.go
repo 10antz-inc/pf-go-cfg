@@ -79,15 +79,15 @@ func NewClient(ctx context.Context, msg any, origin store.Store, pubsub pubsub.P
 
 	go func() {
 		ctx := context.Background()
-		if err := pubsub.Subscribe(ctx, func(ctx context.Context, _ []byte) error {
-			if err := c.del(ctx, c.cache); err != nil {
-				return ers.W(err)
-			}
-			return nil
-		}); err != nil {
-			log.Fatalf("failed to subscribe: %v", err)
+		err := pubsub.Subscribe(ctx, func(ctx context.Context, _ []byte) error {
+			// 更新が発生したためキャッシュをクリアする
+			return ers.W(c.del(ctx, c.cache))
+		})
+		if err != nil {
+			log.Fatalf("failed to subscribe: %+v", err)
 			c.available = false
 		}
+		log.Printf("33333 %+v", err)
 	}()
 
 	return c, nil
