@@ -13,7 +13,6 @@ github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 github.com/cncf/udpa/go v0.0.0-20191209042840-269d4d468f6f/go.mod h1:M8M6+tZqaGXZJjfX53e64911xZQV5JYwmTeXPW+k8Sc=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/envoyproxy/go-control-plane v0.9.0/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=
 github.com/envoyproxy/go-control-plane v0.9.1-0.20191026205805-5f8ba28d4473/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=
@@ -78,8 +77,8 @@ github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4/go.mod h1:
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5cxcmMvtA=
 github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
-github.com/tys-muta/go-ers v0.0.7 h1:8YsQXgaBNKpm/n+BVJKvz2hLr/ow3L7VqW1hGRqJ7hA=
-github.com/tys-muta/go-ers v0.0.7/go.mod h1:iN8/GIlWxQo4bd90LFqh4tjc8xgBjCJQ9YUb8V41o9U=
+github.com/tys-muta/go-ers v0.1.9 h1:jjYGVtmI3Idy3n0s1pEgIAS4qnzvJPlqlqHSWVYWnjc=
+github.com/tys-muta/go-ers v0.1.9/go.mod h1:CNri+4mL6Jo2jutZfsRUmhBFUc31k+X+7TJ9Jf7W7Rs=
 github.com/tys-muta/go-opt v0.1.5 h1:wnFdq9GHn/C0OPUa4Lhz2O1eKO70b2dFcTGWQuSFqwA=
 github.com/tys-muta/go-opt v0.1.5/go.mod h1:tdF2DYUNo1VlmYmQ99ZxY4c4tXSSbBs2HKoH23vdVtQ=
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
