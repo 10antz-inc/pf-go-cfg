@@ -2,7 +2,6 @@ package cfg
 
 import (
 	"context"
-	"log"
 	"reflect"
 	"sync"
 	"time"
@@ -84,10 +83,8 @@ func NewClient(ctx context.Context, msg any, origin store.Store, pubsub pubsub.P
 			return ers.W(c.del(ctx, c.cache))
 		})
 		if err != nil {
-			log.Fatalf("failed to subscribe: %+v", err)
 			c.available = false
 		}
-		log.Printf("33333 %+v", err)
 	}()
 
 	return c, nil
