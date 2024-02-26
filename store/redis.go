@@ -4,7 +4,7 @@ import (
 	"context"
 
 	p_redis "github.com/go-redis/redis"
-	"github.com/tys-muta/go-opt"
+	"github.com/tys-muta/go-cfg/store/option"
 )
 
 // 必要になった時に実装
@@ -23,7 +23,7 @@ func (s *redis) Get(ctx context.Context, key string) ([]byte, error) {
 	return nil, nil
 }
 
-func (s *redis) Set(ctx context.Context, key string, value []byte, options ...opt.Option) error {
+func (s *redis) Set(ctx context.Context, key string, value []byte, options ...option.CacheOption) error {
 	return nil
 }
 

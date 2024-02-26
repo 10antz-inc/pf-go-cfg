@@ -2,12 +2,10 @@ package store
 
 import (
 	"context"
-	"time"
 
 	"github.com/patrickmn/go-cache"
-	s_option "github.com/tys-muta/go-cfg/store/option"
+	"github.com/tys-muta/go-cfg/store/option"
 	"github.com/tys-muta/go-ers"
-	"github.com/tys-muta/go-opt"
 )
 
 type memory struct {
@@ -16,24 +14,15 @@ type memory struct {
 
 var _ Store = (*memory)(nil)
 
-func NewMemory(options ...opt.Option) *memory {
+func NewMemory(options ...option.MemoryOption) *memory {
 	s := &memory{}
 
-	o := &s_option.MemoryOptions{}
-	if err := opt.Reflect(o, options...); err != nil {
-		return s
+	o := option.MemoryOptions{}
+	for _, option := range options {
+		option(&o)
 	}
 
-	var defaultExpiration time.Duration
-	if v := o.DefaultExpiration; v != nil {
-		defaultExpiration = time.Duration(*v)
-	}
-	var cleanupInterval time.Duration
-	if v := o.CleanupInterval; v != nil {
-		cleanupInterval = time.Duration(*v)
-	}
-
-	s.client = cache.New(defaultExpiration, cleanupInterval)
+	s.client = cache.New(o.DefaultExpiration, o.CleanupInterval)
 
 	return s
 }
@@ -48,18 +37,13 @@ func (s *memory) Get(ctx context.Context, key string) ([]byte, error) {
 	}
 }
 
-func (s *memory) Set(ctx context.Context, key string, value []byte, options ...opt.Option) error {
-	o := &s_option.CacheOptions{}
-	if err := opt.Reflect(o, options...); err != nil {
-		return ers.W(err)
+func (s *memory) Set(ctx context.Context, key string, value []byte, options ...option.CacheOption) error {
+	o := option.CacheOptions{}
+	for _, option := range options {
+		option(&o)
 	}
 
-	var duration time.Duration = cache.DefaultExpiration
-	if v := o.Expiration; v != nil {
-		duration = time.Duration(*v)
-	}
-
-	s.client.Set(key, value, duration)
+	s.client.Set(key, value, o.Expiration)
 
 	return nil
 }

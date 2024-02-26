@@ -11,9 +11,8 @@ import (
 	"github.com/tys-muta/go-cfg/option"
 	"github.com/tys-muta/go-cfg/pubsub"
 	"github.com/tys-muta/go-cfg/store"
-	s_option "github.com/tys-muta/go-cfg/store/option"
+	store_option "github.com/tys-muta/go-cfg/store/option"
 	"github.com/tys-muta/go-ers"
-	"github.com/tys-muta/go-opt"
 )
 
 type Client interface {
@@ -26,20 +25,20 @@ type Client interface {
 }
 
 type client struct {
-	mu        map[store.Store]*sync.RWMutex
-	msg       *message
-	origin    store.Store
-	cache     store.Store
-	pubsub    pubsub.PubSub
-	encoder   encoder.Encoder
-	decoder   decoder.Decoder
-	options   option.ClientOptions
-	available bool
+	mu         map[store.Store]*sync.RWMutex
+	msg        *message
+	origin     store.Store
+	pubsub     pubsub.PubSub
+	cacheStore store.Store
+	available  bool
+	encoder    encoder.Encoder
+	decoder    decoder.Decoder
+	option     option.Client
 }
 
 var _ Client = (*client)(nil)
 
-func NewClient(ctx context.Context, msg any, origin store.Store, pubsub pubsub.PubSub, options ...opt.Option) (Client, error) {
+func NewClient(ctx context.Context, msg any, origin store.Store, pubsub pubsub.PubSub, options ...option.ClientOption) (Client, error) {
 	c := &client{
 		msg:       newMessage(msg),
 		origin:    origin,
@@ -47,30 +46,30 @@ func NewClient(ctx context.Context, msg any, origin store.Store, pubsub pubsub.P
 		available: true,
 	}
 
-	if err := opt.Reflect(&c.options, options...); err != nil {
-		return nil, ers.W(err)
+	for _, option := range options {
+		option(&c.option)
 	}
 
-	if v := c.options.Cache; v != nil {
-		c.cache = v
+	if v := c.option.CacheStore; v != nil {
+		c.cacheStore = v
 	} else {
-		c.cache = store.NewMemory(
-			s_option.WithDefaultExpiration(5*time.Minute),
-			s_option.WithCleanupInterval(60*time.Minute),
+		c.cacheStore = store.NewMemory(
+			store_option.WithDefaultExpiration(time.Duration(5*time.Minute)),
+			store_option.WithCleanupInterval(60*time.Minute),
 		)
 	}
 
 	c.mu = map[store.Store]*sync.RWMutex{}
 	c.mu[c.origin] = &sync.RWMutex{}
-	c.mu[c.cache] = &sync.RWMutex{}
+	c.mu[c.cacheStore] = &sync.RWMutex{}
 
-	if v := c.options.Encoder; v != nil {
+	if v := c.option.Encoder; v != nil {
 		c.encoder = v
 	} else {
 		c.encoder = encoder.NewJSON()
 	}
 
-	if v := c.options.Decoder; v != nil {
+	if v := c.option.Decoder; v != nil {
 		c.decoder = v
 	} else {
 		c.decoder = decoder.NewJSON()
@@ -80,7 +79,7 @@ func NewClient(ctx context.Context, msg any, origin store.Store, pubsub pubsub.P
 		ctx := context.Background()
 		err := pubsub.Subscribe(ctx, func(ctx context.Context, _ []byte) error {
 			// 更新が発生したためキャッシュをクリアする
-			return ers.W(c.del(ctx, c.cache))
+			return ers.W(c.del(ctx, c.cacheStore))
 		})
 		if err != nil {
 			c.available = false
@@ -91,7 +90,7 @@ func NewClient(ctx context.Context, msg any, origin store.Store, pubsub pubsub.P
 }
 
 func (c *client) Get(ctx context.Context) (val any, err error) {
-	val, err = c.get(ctx, c.cache)
+	val, err = c.get(ctx, c.cacheStore)
 	if err != nil {
 		return nil, ers.W(err)
 	}
@@ -104,7 +103,7 @@ func (c *client) Get(ctx context.Context) (val any, err error) {
 		return nil, ers.W(err)
 	}
 	if val != nil {
-		if err := c.set(ctx, c.cache, val); err != nil {
+		if err := c.set(ctx, c.cacheStore, val); err != nil {
 			return nil, ers.W(err)
 		}
 		return val, nil
@@ -114,7 +113,7 @@ func (c *client) Get(ctx context.Context) (val any, err error) {
 }
 
 func (c *client) Set(ctx context.Context, value any) error {
-	if err := c.set(ctx, c.cache, value); err != nil {
+	if err := c.set(ctx, c.cacheStore, value); err != nil {
 		return ers.W(err)
 	}
 
@@ -187,9 +186,9 @@ func (c *client) set(ctx context.Context, store store.Store, value any) error {
 		return ers.ErrInvalidArgument.New("message type is mismatch")
 	}
 
-	options := []opt.Option{}
-	if v := c.options.Expiration; v != nil {
-		options = append(options, s_option.WithExpiration(time.Duration(*v)))
+	options := []store_option.CacheOption{}
+	if v := c.option.Expiration; v != 0 {
+		options = append(options, store_option.WithExpiration(v))
 	}
 
 	bytes, err := c.Encode(value)
