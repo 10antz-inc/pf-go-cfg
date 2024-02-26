@@ -4,7 +4,7 @@ import (
 	"context"
 	p_sql "database/sql"
 
-	"github.com/tys-muta/go-opt"
+	"github.com/tys-muta/go-cfg/store/option"
 )
 
 // 必要になった時に実装
@@ -23,7 +23,7 @@ func (s *sql) Get(ctx context.Context, key string) ([]byte, error) {
 	return nil, nil
 }
 
-func (s *sql) Set(ctx context.Context, key string, value []byte, options ...opt.Option) error {
+func (s *sql) Set(ctx context.Context, key string, value []byte, options ...option.CacheOption) error {
 	return nil
 }
 

@@ -79,8 +79,6 @@ github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5
 github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/tys-muta/go-ers v0.1.9 h1:jjYGVtmI3Idy3n0s1pEgIAS4qnzvJPlqlqHSWVYWnjc=
 github.com/tys-muta/go-ers v0.1.9/go.mod h1:CNri+4mL6Jo2jutZfsRUmhBFUc31k+X+7TJ9Jf7W7Rs=
-github.com/tys-muta/go-opt v0.1.5 h1:wnFdq9GHn/C0OPUa4Lhz2O1eKO70b2dFcTGWQuSFqwA=
-github.com/tys-muta/go-opt v0.1.5/go.mod h1:tdF2DYUNo1VlmYmQ99ZxY4c4tXSSbBs2HKoH23vdVtQ=
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 go.opencensus.io v0.23.0 h1:gqCw0LfLxScz8irSi8exQc7fyQ0fKQU/qnC/X8+V/1M=
 go.opencensus.io v0.23.0/go.mod h1:XItmlyltB5F7CS4xOC1DcqMoFqwtC6OG2xF7mCv7P7E=
