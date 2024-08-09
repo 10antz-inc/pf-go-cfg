@@ -3,9 +3,9 @@ package option
 import (
 	"time"
 
-	"github.com/tys-muta/go-cfg/decoder"
-	"github.com/tys-muta/go-cfg/encoder"
-	"github.com/tys-muta/go-cfg/store"
+	"github.com/10antz-inc/pf-go-cfg/decoder"
+	"github.com/10antz-inc/pf-go-cfg/encoder"
+	"github.com/10antz-inc/pf-go-cfg/store"
 )
 
 type Client struct {

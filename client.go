@@ -6,13 +6,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/tys-muta/go-cfg/decoder"
-	"github.com/tys-muta/go-cfg/encoder"
-	"github.com/tys-muta/go-cfg/option"
-	"github.com/tys-muta/go-cfg/pubsub"
-	"github.com/tys-muta/go-cfg/store"
-	store_option "github.com/tys-muta/go-cfg/store/option"
-	"github.com/tys-muta/go-ers"
+	"github.com/10antz-inc/pf-go-cfg/decoder"
+	"github.com/10antz-inc/pf-go-cfg/encoder"
+	"github.com/10antz-inc/pf-go-cfg/option"
+	"github.com/10antz-inc/pf-go-cfg/pubsub"
+	"github.com/10antz-inc/pf-go-cfg/store"
+	store_option "github.com/10antz-inc/pf-go-cfg/store/option"
+	"github.com/10antz-inc/pf-go-ers"
 )
 
 type Client interface {

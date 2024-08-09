@@ -3,8 +3,8 @@ package store
 import (
 	"context"
 
+	"github.com/10antz-inc/pf-go-cfg/store/option"
 	p_redis "github.com/go-redis/redis"
-	"github.com/tys-muta/go-cfg/store/option"
 )
 
 // 必要になった時に実装

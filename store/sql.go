@@ -4,7 +4,7 @@ import (
 	"context"
 	p_sql "database/sql"
 
-	"github.com/tys-muta/go-cfg/store/option"
+	"github.com/10antz-inc/pf-go-cfg/store/option"
 )
 
 // 必要になった時に実装

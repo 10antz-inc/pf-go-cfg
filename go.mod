@@ -1,13 +1,13 @@
-module github.com/tys-muta/go-cfg
+module github.com/10antz-inc/pf-go-cfg
 
 go 1.18
 
 require (
 	cloud.google.com/go/pubsub v1.26.0
+	github.com/10antz-inc/pf-go-ers v0.1.9
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/google/uuid v1.3.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
-	github.com/tys-muta/go-ers v0.1.9
 )
 
 require (
